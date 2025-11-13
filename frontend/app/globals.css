@@ -1,0 +1,28 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: dark light;
+}
+
+body {
+  @apply bg-slate-950 text-slate-100 antialiased;
+}
+
+.glass-panel {
+  @apply bg-slate-900/70 backdrop-blur-xl border border-slate-700/60 shadow-glow;
+}
+
+.gradient-text {
+  @apply bg-clip-text text-transparent bg-gradient-to-r from-primary-400 via-accent-400 to-primary-200;
+}
+
+.btn {
+  @apply inline-flex items-center justify-center rounded-full bg-primary-500 px-5 py-2 font-medium text-white transition hover:-translate-y-0.5 hover:bg-primary-400 hover:shadow-glow focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-300;
+}
+
+.card {
+  @apply glass-panel rounded-3xl p-8;
+}
+

@@ -1,5 +1,6 @@
 require('dotenv').config();
 const express = require('express');
+const cors = require('cors');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const prisma = require('./db');
@@ -7,11 +8,17 @@ const prisma = require('./db');
 const app = express();
 const PORT = process.env.PORT || 3001;
 const JWT_SECRET = process.env.JWT_SECRET;
+const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:3000';
 
 if (!JWT_SECRET) {
   console.warn('JWT_SECRET is not set. JWT generation will fail.');
 }
 
+app.use(cors({
+  origin: FRONTEND_URL,
+  credentials: true,
+  allowedHeaders: ['Content-Type', 'Authorization']
+}));
 app.use(express.json());
 
 const generateToken = (userId) => {
