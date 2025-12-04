@@ -147,25 +147,5 @@ export function generateCaption(data) {
   });
 }
 
-// External Events endpoints (RapidAPI)
-export function getExternalEvents(filters = {}) {
-  const params = new URLSearchParams();
-  if (filters.city) params.append("city", filters.city);
-  if (filters.state) params.append("state", filters.state);
-  if (filters.country) params.append("country", filters.country);
-  if (filters.category) params.append("category", filters.category);
-  if (filters.limit) params.append("limit", filters.limit);
-  
-  return request(`/api/events/external?${params.toString()}`).catch(error => {
-    // Return error information instead of throwing
-    console.error('Error fetching external events:', error);
-    return {
-      events: [],
-      error: error.data?.error || error.data?.message || error.message || 'Failed to fetch external events',
-      total: 0
-    };
-  });
-}
-
 export { API_BASE_URL };
 

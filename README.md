@@ -72,20 +72,7 @@ A full-stack event management platform built with Next.js and Express.
    PORT=3001
    FRONTEND_URL="http://localhost:3000"
    API_BASE_URL="http://localhost:3001"
-   
-   # Ticketmaster API Configuration (Optional - for local events)
-   TICKETMASTER_API_KEY="your_ticketmaster_api_key"
-   TICKETMASTER_HOST="app.ticketmaster.com"
    ```
-   
-   **To get Ticketmaster API key:**
-   1. Go to https://developer.ticketmaster.com/
-   2. Register for a free account
-   3. Create a new app to get your API key
-   4. Copy your API key
-   5. Add it to `backend/.env` as shown above
-   
-   📖 **Detailed setup: See [TICKETMASTER_SETUP.md](./TICKETMASTER_SETUP.md)**
 
    Create a `.env.local` file in the `frontend` directory (optional):
    ```env
@@ -171,7 +158,7 @@ AP_eventHive/
 - Event management
 - College-based event filtering
 - Event registration and saving
-- **Local events from Ticketmaster** - Discover real-world events in your area
+  (External local events via Ticketmaster/RapidAPI have been removed and are no longer used.)
 - Admin dashboard
 - Responsive UI with Tailwind CSS
 
