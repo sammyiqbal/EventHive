@@ -14,10 +14,70 @@ datasource db {
 }
 
 model User {
+  id           Int          @id @default(autoincrement())
+  email        String       @unique
+  name         String?
+  password     String
+  role         String       @default("student") // "student" or "admin"
+  collegeId    Int?
+  college      College?     @relation(fields: [collegeId], references: [id])
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+  createdEvents Event[]      @relation("EventCreator")
+  savedEvents  SavedEvent[]
+  registrations Registration[]
+}
+
+model College {
   id        Int      @id @default(autoincrement())
-  email     String   @unique
-  name      String?
-  password  String
+  name      String   @unique
+  city      String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  users     User[]
+  events    Event[]
+}
+
+model Event {
+  id          Int            @id @default(autoincrement())
+  title       String
+  description String
+  category    String         // "Tech", "Cultural", "Workshop", "Competition", etc.
+  date        DateTime
+  location    String?
+  imageUrl    String?
+  collegeId   Int
+  college     College        @relation(fields: [collegeId], references: [id])
+  createdBy   Int
+  creator     User           @relation("EventCreator", fields: [createdBy], references: [id])
+  isPublic    Boolean        @default(true)
+  tags        String[]       @default([])
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+  savedBy     SavedEvent[]
+  registrations Registration[]
+}
+
+model SavedEvent {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id])
+  eventId   Int
+  event     Event    @relation(fields: [eventId], references: [id])
+  createdAt DateTime @default(now())
+  
+  @@unique([userId, eventId])
+}
+
+model Registration {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id])
+  eventId   Int
+  event     Event    @relation(fields: [eventId], references: [id])
+  status    String   @default("registered") // "registered", "attended", "cancelled"
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  @@unique([userId, eventId])
 }

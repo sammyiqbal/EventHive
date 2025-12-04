@@ -7,7 +7,7 @@
 }
 
 body {
-  @apply bg-slate-950 text-slate-100 antialiased;
+  @apply text-slate-100 antialiased;
 }
 
 .glass-panel {
@@ -16,6 +16,16 @@ body {
 
 .gradient-text {
   @apply bg-clip-text text-transparent bg-gradient-to-r from-primary-400 via-accent-400 to-primary-200;
+}
+
+.brand-title {
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", sans-serif;
+  @apply gradient-text font-semibold tracking-wide text-lg sm:text-xl md:text-2xl;
+}
+
+.brand-title-sub {
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", sans-serif;
+  @apply text-xs uppercase tracking-[0.18em] text-slate-400;
 }
 
 .btn {

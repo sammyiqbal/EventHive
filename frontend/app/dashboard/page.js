@@ -1,205 +1,260 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
-import { ArrowUpRight, BarChart3, CalendarDays, Clock, Megaphone, ServerCog, Users } from "lucide-react";
-import { Button } from "../../components/ui/button";
 import { Card } from "../../components/ui/card";
-import { getHealth } from "../../lib/api";
+import { Button } from "../../components/ui/button";
+import { Input } from "../../components/ui/input";
+import { getCurrentUser, getEvents, getSavedEvents } from "../../lib/api";
+import { useAuth } from "../../contexts/auth-context";
+import { Calendar, MapPin, Tag, Bookmark, Search, TrendingUp, Clock } from "lucide-react";
+import Link from "next/link";
 
-const metrics = [
-  {
-    label: "Active events",
-    value: "7",
-    trend: "+2 this week",
-    icon: <CalendarDays className="h-5 w-5 text-primary-300" />
-  },
-  {
-    label: "Guest confirmations",
-    value: "1,248",
-    trend: "+14.5%",
-    icon: <Users className="h-5 w-5 text-primary-300" />
-  },
-  {
-    label: "Time saved",
-    value: "86 hrs",
-    trend: "Automation impact",
-    icon: <Clock className="h-5 w-5 text-primary-300" />
-  }
-];
-
-const timeline = [
-  {
-    title: "Investor Summit NYC",
-    date: "Mar 18",
-    detail: "Speaker run-through & AV sync",
-    status: "In progress"
-  },
-  {
-    title: "Creator Lab 2.0",
-    date: "Mar 22",
-    detail: "Finalize brand partnerships",
-    status: "Action needed"
-  },
-  {
-    title: "Product Debut Berlin",
-    date: "Apr 03",
-    detail: "Guest experience journey mapping",
-    status: "On track"
-  }
-];
-
-export default function DashboardPage() {
-  const [health, setHealth] = useState({ status: "checking...", database: null });
-  const [healthError, setHealthError] = useState("");
+export default function StudentDashboard() {
+  const router = useRouter();
+  const { user, loading: authLoading } = useAuth();
+  const [profile, setProfile] = useState(null);
+  const [savedEvents, setSavedEvents] = useState([]);
+  const [recommendedEvents, setRecommendedEvents] = useState([]);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    let isMounted = true;
+    if (!authLoading && !user) {
+      router.push("/login");
+      return;
+    }
+    if (user && user.role === "admin") {
+      router.push("/dashboard/admin");
+      return;
+    }
+    if (user) {
+      loadDashboard();
+    }
+  }, [user, authLoading, router]);
 
-    getHealth()
-      .then((data) => {
-        if (!isMounted) return;
-        setHealth({
-          status: data?.status || "unknown",
-          database: data?.database || "unknown"
-        });
-      })
-      .catch((err) => {
-        if (!isMounted) return;
-        setHealthError(err?.message || "Unable to reach API");
-      });
+  const loadDashboard = async () => {
+    try {
+      const [userData, saved, recommended] = await Promise.all([
+        getCurrentUser(),
+        getSavedEvents(user.id),
+        getEvents({ limit: 6 }),
+      ]);
+      
+      setProfile(userData);
+      setSavedEvents(saved);
+      setRecommendedEvents(recommended.events || []);
+    } catch (error) {
+      console.error("Failed to load dashboard:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    return () => {
-      isMounted = false;
-    };
-  }, []);
+  const handleSearch = async () => {
+    try {
+      const results = await getEvents({ q: searchQuery, limit: 10 });
+      setRecommendedEvents(results.events || []);
+    } catch (error) {
+      console.error("Search failed:", error);
+    }
+  };
+
+  if (authLoading || loading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+          <p className="text-white">Loading dashboard...</p>
+        </div>
+      </div>
+    );
+  }
+
+  const upcomingRegistrations = profile?.registrations?.filter(
+    (reg) => new Date(reg.event.date) > new Date()
+  ) || [];
 
   return (
-    <div className="flex flex-col gap-10">
-      <section className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
-        <div>
-          <h1 className="text-3xl font-semibold text-white md:text-4xl">
-            Dashboard
-          </h1>
-          <p className="mt-2 max-w-2xl text-sm text-slate-400">
-            Pulse on every experience. Automations humming, guests delighted, teams in sync.
-          </p>
-        </div>
-        <Button className="w-full gap-2 px-5 py-3 text-sm font-semibold lg:w-auto">
-          Create event
-          <ArrowUpRight className="h-4 w-4" />
-        </Button>
-      </section>
+    <div className="container mx-auto px-4 py-8 max-w-7xl">
+      {/* Welcome Header */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="mb-8"
+      >
+        <h1 className="text-4xl font-bold text-white mb-2">
+          Welcome back, {profile?.name || user?.name || "Student"}! 👋
+        </h1>
+        <p className="text-slate-400">Discover and manage your events</p>
+      </motion.div>
 
-      <section className="grid gap-6 md:grid-cols-3">
-        {metrics.map((metric, index) => (
-          <motion.div
-            key={metric.label}
-            initial={{ opacity: 0, y: 16 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ delay: index * 0.1, duration: 0.45 }}
-            viewport={{ once: true }}
-          >
-            <Card className="space-y-5">
-              <div className="flex items-center justify-between text-sm text-slate-400">
-                <span>{metric.label}</span>
-                {metric.icon}
-              </div>
-              <p className="text-3xl font-semibold text-white">{metric.value}</p>
-              <p className="text-xs uppercase tracking-[0.3em] text-primary-200/70">{metric.trend}</p>
-            </Card>
-          </motion.div>
-        ))}
-      </section>
-
-      <section className="grid gap-6 lg:grid-cols-[2fr,1fr]">
-        <Card className="space-y-6">
+      {/* Quick Stats */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <Card className="p-6 bg-white/5 backdrop-blur-xl border-white/20">
           <div className="flex items-center justify-between">
-            <h2 className="text-lg font-semibold text-white">Engagement trajectory</h2>
-            <Button variant="ghost" className="gap-2 text-xs uppercase tracking-[0.25em] text-slate-400">
-              View report
-              <BarChart3 className="h-4 w-4" />
-            </Button>
-          </div>
-          <div className="rounded-2xl border border-slate-800/70 bg-slate-900/80 p-6">
-            <div className="h-56 w-full rounded-2xl bg-gradient-to-tr from-primary-500/20 via-primary-400/10 to-primary-300/20">
-              <div className="flex h-full items-end justify-between px-4 pb-4">
-                {[40, 62, 48, 78, 92, 86, 104].map((height, idx) => (
-                  <div
-                    key={idx}
-                    className="w-10 rounded-t-full bg-gradient-to-t from-primary-600 to-primary-300"
-                    style={{ height: `${height}px` }}
-                  />
-                ))}
-              </div>
-            </div>
-          </div>
-        </Card>
-
-        <Card className="space-y-6">
-          <div className="flex items-center justify-between">
-            <h2 className="text-lg font-semibold text-white">Momentum alerts</h2>
-            <Button variant="ghost" className="gap-2 text-xs uppercase tracking-[0.25em] text-slate-400">
-              Automations
-              <Megaphone className="h-4 w-4" />
-            </Button>
-          </div>
-          <ul className="space-y-5 text-sm text-slate-300">
-            {timeline.map((item) => (
-              <li key={item.title} className="rounded-2xl border border-slate-800/70 bg-slate-900/80 p-5">
-                <div className="flex items-center justify-between">
-                  <p className="text-base font-semibold text-white">{item.title}</p>
-                  <span className="text-xs uppercase tracking-[0.3em] text-primary-200/80">{item.status}</span>
-                </div>
-                <p className="mt-2 text-xs uppercase tracking-[0.3em] text-slate-500">{item.date}</p>
-                <p className="mt-3 text-sm text-slate-300">{item.detail}</p>
-              </li>
-            ))}
-          </ul>
-        </Card>
-      </section>
-
-      <section className="grid gap-4 md:grid-cols-2">
-        <Card className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-          <div className="flex items-start gap-3">
-            <span className="mt-1 inline-flex h-10 w-10 items-center justify-center rounded-full bg-primary-500/15">
-              <ServerCog className="h-5 w-5 text-primary-300" />
-            </span>
             <div>
-              <h3 className="text-base font-semibold text-white">API connectivity</h3>
-              {healthError ? (
-                <p className="text-sm text-red-300">{healthError}</p>
-              ) : (
-                <p className="text-sm text-slate-300">
-                  Status: <span className="text-primary-200">{health.status}</span> · Database:{" "}
-                  <span className="text-primary-200">{health.database || "verifying..."}</span>
-                </p>
-              )}
+              <p className="text-slate-400 text-sm mb-1">Saved Events</p>
+              <p className="text-3xl font-bold text-white">{savedEvents.length}</p>
             </div>
+            <Bookmark className="h-8 w-8 text-primary-400" />
+          </div>
+        </Card>
+        
+        <Card className="p-6 bg-white/5 backdrop-blur-xl border-white/20">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-slate-400 text-sm mb-1">Upcoming</p>
+              <p className="text-3xl font-bold text-white">{upcomingRegistrations.length}</p>
+            </div>
+            <Clock className="h-8 w-8 text-secondary-400" />
+          </div>
+        </Card>
+        
+        <Card className="p-6 bg-white/5 backdrop-blur-xl border-white/20">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-slate-400 text-sm mb-1">Total Events</p>
+              <p className="text-3xl font-bold text-white">{recommendedEvents.length}</p>
+            </div>
+            <TrendingUp className="h-8 w-8 text-accent-400" />
+          </div>
+        </Card>
+      </div>
+
+      {/* Search Bar */}
+      <Card className="mb-8 bg-white/5 border-white/20 p-6 backdrop-blur-xl">
+        <div className="flex flex-col gap-4 sm:flex-row">
+          <div className="flex-1">
+            <Input
+              placeholder="Search events by name, category, or college..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              onKeyPress={(e) => e.key === "Enter" && handleSearch()}
+              className="bg-white/10 border-white/20 text-white placeholder:text-slate-400"
+            />
           </div>
           <Button
-            variant="ghost"
-            className="gap-2 text-xs uppercase tracking-[0.25em] text-slate-400"
-            onClick={() => {
-              setHealthError("");
-              setHealth({ status: "checking...", database: null });
-              getHealth()
-                .then((data) => {
-                  setHealth({
-                    status: data?.status || "unknown",
-                    database: data?.database || "unknown"
-                  });
-                })
-                .catch((err) => {
-                  setHealthError(err?.message || "Unable to reach API");
-                });
-            }}
+            onClick={handleSearch}
+            className="w-full bg-primary-500 hover:bg-primary-600 sm:w-auto"
           >
-            Recheck
+            <Search className="mr-2 h-4 w-4" />
+            Search
           </Button>
-        </Card>
-      </section>
+        </div>
+      </Card>
+
+      {/* Saved Events */}
+      {savedEvents.length > 0 && (
+        <div className="mb-8">
+          <h2 className="text-2xl font-semibold text-white mb-4">Your Saved Events</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {savedEvents.map((event) => (
+              <EventCard key={event.id} event={event} />
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Recommended Events */}
+      <div className="mb-8">
+        <h2 className="text-2xl font-semibold text-white mb-4">Recommended Events</h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {recommendedEvents.map((event) => (
+            <EventCard key={event.id} event={event} />
+          ))}
+        </div>
+        {recommendedEvents.length === 0 && (
+          <Card className="p-8 text-center bg-white/5 backdrop-blur-xl border-white/20">
+            <p className="text-slate-400">No events found. Check back later!</p>
+          </Card>
+        )}
+      </div>
+
+      {/* Recent Activity */}
+      {upcomingRegistrations.length > 0 && (
+        <div>
+          <h2 className="text-2xl font-semibold text-white mb-4">Upcoming Registrations</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {upcomingRegistrations.map((reg) => (
+              <Card key={reg.id} className="p-6 bg-white/5 backdrop-blur-xl border-white/20">
+                <h3 className="text-xl font-semibold text-white mb-2">{reg.event.title}</h3>
+                <div className="flex items-center gap-4 text-slate-400 text-sm">
+                  <div className="flex items-center gap-1">
+                    <Calendar className="h-4 w-4" />
+                    <span>{new Date(reg.event.date).toLocaleDateString()}</span>
+                  </div>
+                  {reg.event.location && (
+                    <div className="flex items-center gap-1">
+                      <MapPin className="h-4 w-4" />
+                      <span>{reg.event.location}</span>
+                    </div>
+                  )}
+                </div>
+                <Button
+                  asChild
+                  variant="outline"
+                  className="mt-4 border-white/20 hover:bg-white/10"
+                >
+                  <Link href={`/events/${reg.event.id}`}>View Details</Link>
+                </Button>
+              </Card>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
 
+function EventCard({ event }) {
+  const eventDate = new Date(event.date);
+  
+  return (
+    <motion.div
+      whileHover={{ y: -4 }}
+      transition={{ duration: 0.2 }}
+    >
+      <Card className="p-6 bg-white/5 backdrop-blur-xl border-white/20 hover:bg-white/10 transition-all cursor-pointer">
+        <Link href={`/events/${event.id}`}>
+          {event.imageUrl && (
+            <div className="relative h-48 rounded-xl overflow-hidden mb-4">
+              <img
+                src={event.imageUrl}
+                alt={event.title}
+                className="w-full h-full object-cover"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+            </div>
+          )}
+          
+          <h3 className="text-xl font-semibold text-white mb-2 line-clamp-2">
+            {event.title}
+          </h3>
+          
+          <div className="flex items-center gap-2 text-slate-400 text-sm mb-3">
+            <Calendar className="h-4 w-4" />
+            <span>{eventDate.toLocaleDateString()}</span>
+          </div>
+          
+          {event.location && (
+            <div className="flex items-center gap-2 text-slate-400 text-sm mb-3">
+              <MapPin className="h-4 w-4" />
+              <span className="line-clamp-1">{event.location}</span>
+            </div>
+          )}
+          
+          <div className="flex items-center justify-between">
+            <span className="px-3 py-1 rounded-full bg-primary-500/20 text-primary-200 text-sm">
+              {event.category}
+            </span>
+            {event.college && (
+              <span className="text-slate-400 text-sm">{event.college.name}</span>
+            )}
+          </div>
+        </Link>
+      </Card>
+    </motion.div>
+  );
+}
