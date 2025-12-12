@@ -1,165 +1,127 @@
-# EventHive - Event Management Platform
+📘 EventHive – The Inter-College Event Hub
 
-A full-stack event management platform built with Next.js and Express.
+EventHive is a full-stack web platform designed to centralize college events—including fests, workshops, competitions, and cultural programs—into a single, accessible hub.
+Clubs and committees can post events, while students across institutions can easily discover, track, and engage with them.
 
-## 🚀 Quick Start (Local Development)
+🚨 Problem Statement
 
-### Prerequisites
-- Node.js (v16+)
-- PostgreSQL database
-- npm or yarn
+Students often miss important college events because information is scattered across:
 
-### Quick Setup
+WhatsApp / Telegram groups
 
-1. **Clone and install:**
-   ```bash
-   npm run install:all
-   ```
+Individual college websites
 
-2. **Set up environment:**
-   - Create `backend/.env` with your database URL and API keys (see below)
+Social media posts
 
-3. **Set up database:**
-   ```bash
-   cd backend
-   npx prisma generate
-   npx prisma migrate dev
-   ```
+Offline notice boards
 
-4. **Start the app:**
-   ```bash
-   npm run dev
-   ```
+EventHive solves this by unifying all event information into one centralized platform, enabling:
 
-5. **Open in browser:**
-   - Frontend: http://localhost:3000
-   - Backend API: http://localhost:3001
+Students → to discover and follow events with ease
 
-📖 **For detailed setup, see below**
+Club Admins → to manage and promote events in a structured way
 
-## Setup (Detailed)
+🛠 System Architecture
 
-### Prerequisites
-- Node.js (v16 or higher)
-- npm or yarn
-- PostgreSQL database
+EventHive follows a modern, decoupled architecture:
 
-### Installation
+Frontend (React.js) → Backend REST API (Node.js/Express) → PostgreSQL Database
 
-1. **Install all dependencies:**
-   ```bash
-   npm run install:all
-   ```
+Frontend
 
-   Or install individually:
-   ```bash
-   # Root dependencies
-   npm install
-   
-   # Backend dependencies
-   cd backend && npm install
-   
-   # Frontend dependencies
-   cd ../frontend && npm install
-   ```
+React.js (SPA)
 
-2. **Set up environment variables:**
+React Router
 
-   Create a `.env` file in the `backend` directory:
-   ```env
-   DATABASE_URL="your_postgresql_connection_string"
-   JWT_SECRET="your_jwt_secret_key"
-   PORT=3001
-   FRONTEND_URL="http://localhost:3000"
-   API_BASE_URL="http://localhost:3001"
-   ```
+Axios
 
-   Create a `.env.local` file in the `frontend` directory (optional):
-   ```env
-   NEXT_PUBLIC_API_BASE_URL=""
-   NEXT_PUBLIC_BACKEND_URL="http://localhost:3001"
-   ```
+TailwindCSS
 
-3. **Set up the database:**
-   ```bash
-   cd backend
-   npx prisma generate
-   npx prisma migrate dev
-   ```
+Hosted on Vercel
 
-## Running the Application
+Backend
 
-### Run both frontend and backend together:
+Node.js
 
-From the root directory:
-```bash
-npm run dev
-```
+Express.js
 
-This will start:
-- **Frontend** on `http://localhost:3000`
-- **Backend** on `http://localhost:3001`
+Secure, modular REST API
 
-### Run services individually:
+Hosted on Render
 
-**Frontend only:**
-```bash
-cd frontend
-npm run dev
-```
+Database
 
-**Backend only:**
-```bash
-cd backend
-npm run dev
-```
+PostgreSQL (Render)
 
-## Port Configuration
+Authentication
 
-- **Frontend (Next.js)**: Port 3000
-- **Backend (Express)**: Port 3001
+JWT-based login & signup
 
-The frontend is configured to proxy API requests to the backend, so most API calls can be made through `http://localhost:3000/api/*` which will be forwarded to the backend automatically.
+bcrypt.js for password hashing
 
-## Project Structure
+⭐ Key Features
+🔐 Authentication & Authorization
 
-```
-AP_eventHive/
-├── backend/          # Express.js API server
-│   ├── prisma/      # Prisma schema and migrations
-│   └── index.js     # Main server file
-├── frontend/        # Next.js frontend application
-│   ├── app/         # Next.js app directory
-│   ├── components/  # React components
-│   └── lib/         # Utility functions
-└── package.json     # Root package.json with scripts
-```
+JWT-based secure login/signup
 
-## Available Scripts
+Role-based access:
 
-### Root Level:
-- `npm run dev` - Run both frontend and backend in development mode
-- `npm run start` - Run both frontend and backend in production mode
-- `npm run install:all` - Install dependencies for all packages
+Students → browse & save events
 
-### Backend:
-- `npm run dev` - Start backend with nodemon (auto-reload)
-- `npm start` - Start backend in production mode
+Admins → manage (CRUD) their college’s events
 
-### Frontend:
-- `npm run dev` - Start Next.js development server on port 3000
-- `npm run build` - Build for production
-- `npm start` - Start production server on port 3000
+🗂 CRUD Event Management
 
-## Features
+Admins can Create, Read, Update, Delete events
 
-- User authentication (JWT-based)
-- OAuth integration (Google, GitHub)
-- Event management
-- College-based event filtering
-- Event registration and saving
-  (External local events via Ticketmaster/RapidAPI have been removed and are no longer used.)
-- Admin dashboard
-- Responsive UI with Tailwind CSS
+Students can view all public events & save favorites
 
+🧭 Event Discovery & Filtering
 
+Filter by:
+
+College name
+
+Event type (Tech, Cultural, Sports…)
+
+Date range
+
+Search bar for direct event lookup
+
+🧠 AI-Powered Captions (Optional Toggle)
+
+Admins can generate catchy event captions using OpenAI API
+
+Helps with event promotion & engagement
+
+🧭 Frontend Routing Pages
+
+Home (All Events Feed)
+
+Login / Signup
+
+Event Details
+
+Student Dashboard
+
+Admin Dashboard
+
+Create / Edit Event Page
+
+🧰 Tech Stack
+Layer	Technologies
+Frontend	React.js, React Router, Axios, TailwindCSS
+Backend	Node.js, Express.js
+Database	PostgreSQL
+Authentication	JWT, bcrypt.js
+AI Integration	OpenAI API
+Hosting	Vercel (Frontend), Render (Backend + DB)
+📡 API Overview
+Endpoint	Method	Description	Access
+/api/auth/register	POST	Register new user (Student/Admin)	Public
+/api/auth/login	POST	User login → returns JWT	Public
+/api/events	GET	Fetch all events	Public
+/api/events	POST	Create event	Admin Only
+/api/events/:id	PUT	Update event	Admin Only
+/api/events/:id	DELETE	Delete event	Admin Only
+/api/ai/generate-caption	POST	Generate event caption using AI	Admin Only
