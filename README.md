@@ -80,11 +80,6 @@ Frontend (React.js) → Backend REST API (Node.js/Express) → PostgreSQL Databa
   * Date range
 * Search bar for direct event lookup
 
-### 🧠 **AI-Powered Captions (Optional Toggle)**
-
-* Admins can generate catchy event captions using OpenAI API
-* Helps with event promotion & engagement
-
 ### 🧭 **Frontend Routing Pages**
 
 * Home (All Events Feed)
