@@ -1,9 +1,12 @@
-EventHive – The Inter-College Event Hub**
+
+# 📘 **EventHive – The Inter-College Event Hub**
 
 EventHive is a full-stack web platform designed to centralize college events—including fests, workshops, competitions, and cultural programs—into a single, accessible hub.
 Clubs and committees can post events, while students across institutions can easily discover, track, and engage with them.
 
-🚨 Problem Statement**
+---
+
+## 🚨 **Problem Statement**
 
 Students often miss important college events because information is scattered across:
 
@@ -12,19 +15,22 @@ Students often miss important college events because information is scattered ac
 * Social media posts
 * Offline notice boards
 
-EventHive solves this by unifying all event information into one centralized platform**, enabling:
+**EventHive solves this by unifying all event information into one centralized platform**, enabling:
 
 * Students → to discover and follow events with ease
 * Club Admins → to manage and promote events in a structured way
 
-🛠 System Architecture**
+---
 
-EventHive follows a modern, decoupled architecture**:
+## 🛠 **System Architecture**
 
-*Frontend (React.js) → Backend REST API (Node.js/Express) → PostgreSQL Database
+EventHive follows a **modern, decoupled architecture**:
 
+```
+Frontend (React.js) → Backend REST API (Node.js/Express) → PostgreSQL Database
+```
 
-Frontend
+### **Frontend**
 
 * React.js (SPA)
 * React Router
@@ -32,39 +38,41 @@ Frontend
 * TailwindCSS
 * Hosted on **Vercel**
 
-Backend
+### **Backend**
 
 * Node.js
 * Express.js
 * Secure, modular REST API
-* Hosted on Render
+* Hosted on **Render**
 
-Database
+### **Database**
 
 * PostgreSQL (Render)
 
-Authentication
+### **Authentication**
 
 * JWT-based login & signup
 * bcrypt.js for password hashing
 
-⭐Key Features
+---
 
-🔐 Authentication & Authorization
+## ⭐ **Key Features**
+
+### 🔐 **Authentication & Authorization**
 
 * JWT-based secure login/signup
 * Role-based access:
 
-  * Students → browse & save events
-  * Admins → manage (CRUD) their college’s events
+  * **Students** → browse & save events
+  * **Admins** → manage (CRUD) their college’s events
 
-🗂 CRUD Event Management
+### 🗂 **CRUD Event Management**
 
-* Admins can Create, Read, Update, Delete events
+* Admins can **Create, Read, Update, Delete** events
 * Students can view all public events & save favorites
 
+### 🧭 **Event Discovery & Filtering**
 
-🧭 Event Discovery & Filtering
 * Filter by:
 
   * College name
@@ -72,12 +80,12 @@ Authentication
   * Date range
 * Search bar for direct event lookup
 
-🧠 AI-Powered Captions (Optional Toggle)
+### 🧠 **AI-Powered Captions (Optional Toggle)**
 
 * Admins can generate catchy event captions using OpenAI API
 * Helps with event promotion & engagement
 
-🧭 Frontend Routing Pages
+### 🧭 **Frontend Routing Pages**
 
 * Home (All Events Feed)
 * Login / Signup
@@ -86,8 +94,9 @@ Authentication
 * Admin Dashboard
 * Create / Edit Event Page
 
+---
 
-🧰 Tech Stack**
+## 🧰 **Tech Stack**
 
 | Layer              | Technologies                               |
 | ------------------ | ------------------------------------------ |
@@ -98,9 +107,9 @@ Authentication
 | **AI Integration** | OpenAI API                                 |
 | **Hosting**        | Vercel (Frontend), Render (Backend + DB)   |
 
+---
 
-
-📡 API Overview**
+## 📡 **API Overview**
 
 | Endpoint                   | Method | Description                       | Access     |
 | -------------------------- | ------ | --------------------------------- | ---------- |
@@ -112,8 +121,9 @@ Authentication
 | `/api/events/:id`          | DELETE | Delete event                      | Admin Only |
 | `/api/ai/generate-caption` | POST   | Generate event caption using AI   | Admin Only |
 
+---
 
-🌐 Hosting
+## 🌐 **Hosting**
 
 Both the frontend and backend are deployed with publicly accessible URLs for demonstration.
 
